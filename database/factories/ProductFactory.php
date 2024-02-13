@@ -6,9 +6,9 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Category>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Product>
  */
-class CategoryFactory extends Factory
+class ProductFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -18,8 +18,12 @@ class CategoryFactory extends Factory
     public function definition(): array
     {
         return [
-            'category' => fake()->name(),
+            'name' => fake()->name(),
             'description' => fake()->paragraph(),
+            'price' => 90000.00,
+            'img'=> Str::random(20),
+            'seller_user_id' => 2,
+            'stock' => 100
         ];
     }
 }

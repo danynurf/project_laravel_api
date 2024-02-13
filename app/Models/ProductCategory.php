@@ -12,4 +12,9 @@ class ProductCategory extends Model
     protected $table = 'products_categories';
 
     protected $guarded = [];
+
+    public function category()
+    {
+        return $this->hasOne(Category::class);
+    }
 }
