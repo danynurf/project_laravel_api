@@ -15,9 +15,9 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->text('description');
-            $table->double('price');
+            $table->unsignedInteger('price');
             $table->text('img');
-            $table->integer('stock');
+            $table->unsignedBigInteger('stock');
             $table->unsignedBigInteger('seller_user_id');
             $table->timestamps();
 

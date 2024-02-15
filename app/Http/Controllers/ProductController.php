@@ -16,7 +16,7 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $products = Product::select('id', 'name', 'img', 'price');
+        $products = Product::select('id', 'name', 'img', 'price', 'stock');
 
         if(auth()->user()->role == 'seller') {
             $products = $products->where('seller_user_id', auth()->id());
@@ -44,12 +44,13 @@ class ProductController extends Controller
             'name' => 'required|string|max:100',
             'description' => 'required|string|max:225',
             'price' => 'required|integer',
+            'stock' => 'required|integer',
             'img' => 'required|string',
             'categories' => 'array|required',
             'categories.*.id' => 'required|integer'
         ]);
 
-        if($validated['price'] <= 0 || $validated['stock'] <= 0) {
+        if($validated['price'] < 0 || $validated['stock'] < 0) {
             return response()->json([
                 'message' => 'The value must be higher than 0'
             ], 400);
@@ -59,14 +60,12 @@ class ProductController extends Controller
         $categories = $validated['categories'];
         unset($validated['categories']);
 
-        foreach($categories as $category) {
-            $data = Category::find($category['id']);
+        $isAny = Category::whereIn('id', $categories)->get();
 
-            if(!$data) {
-                return response()->json([
-                    'message' => 'The category not found'
-                ], 404);
-            }
+        if(count($isAny) < count($categories)) {
+            return response()->json([
+                'message' => 'The category not found'
+            ], 404);
         }
 
         DB::beginTransaction();
@@ -104,8 +103,9 @@ class ProductController extends Controller
     {
         $product = Product::find($id);
 
-        if(auth()->user()->role == 'seller')
+        if(auth()->user()->role == 'seller') {
             $product = Product::where('seller_user_id', auth()->id())->find($id);
+        }
 
         if(!$product) {
             return response()->json([
@@ -150,8 +150,33 @@ class ProductController extends Controller
         ]);
 
         foreach($validated as $key => $value) {
-            if($value == null || $value <= 0) {
+            if($value == null || $value < 0) {
                 $validated[$key] = $product[$key];
+            }
+        }
+
+        if(isset($validated['categories'])) {
+            $categories = $validated['categories'];
+            unset($validated['categories']);
+
+            $isAny = Category::whereIn('id', $categories)->get();
+
+            if(count($isAny) < count($categories)) {
+                return response()->json([
+                    'message' => 'The category not found'
+                ], 404);
+            }
+
+            $product_categories = ProductCategory::where('product_id', $id);
+            $product_categories->delete();
+
+            foreach($categories as $category) {
+                $data = [
+                    'product_id' => $id,
+                    'category_id' => $category['id'],
+                ];
+
+                ProductCategory::create($data);
             }
         }
 
@@ -162,6 +187,41 @@ class ProductController extends Controller
                 'message'=> 'Failed to update product',
             ], 500);
         }
+
+        return response()->json([
+            'message' => 'Successfully to update product'
+        ], 200);
+    }
+
+    public function addStock(Request $request, string $id)
+    {
+        if(auth()->user()->role == 'buyer') {
+            return response()->json([
+                'message' => 'You are a buyer. You do not have a permission to access the product'
+            ], 403);
+        }
+
+        $product = Product::where('seller_user_id', auth()->id())->find($id);
+
+        if(!$product) {
+            return response()->json([
+                'message' => 'Product not found.'
+            ], 404);
+        }
+
+        $validated = $request->validate([
+            'stock' => 'required|integer',
+        ]);
+
+        if($validated['stock'] < 0) {
+            return response()->json([
+                'message' => 'The stock must be higher than 0'
+            ], 400);
+        }
+
+        $product->update([
+            'stock' => $product->stock + $validated['stock'],
+        ]);
 
         return response()->json([
             'message' => 'Successfully to update product'

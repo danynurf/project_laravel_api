@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\CartController;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,7 +31,7 @@ Route::post('/register/{role}', [AuthController::class, 'register'])
 
 Route::middleware(['auth:api'])->group(function () {
 
-    Route::post('/register/{role}', [AuthController::class, 'register'])
+    Route::post('/registering/{role}', [AuthController::class, 'register'])
         ->name('register.seller');
 
 
@@ -47,6 +48,9 @@ Route::middleware(['auth:api'])->group(function () {
 
     Route::put('/products/{id}', [ProductController::class, 'update'])
         ->name('products.update');
+
+    Route::put('/products/{id}/stock', [ProductController::class, 'addStock'])
+        ->name('products.stock');
 
     Route::delete('/products/{id}', [ProductController::class, 'destroy'])
         ->name('products.destroy');
@@ -68,5 +72,23 @@ Route::middleware(['auth:api'])->group(function () {
 
     Route::delete('/categories/{id}', [CategoryController::class, 'destroy'])
         ->name('categories.destroy');
+
+
+    // Cart route
+
+    Route::post('carts', [CartController::class, 'store'])
+        ->name('carts.store');
+
+    Route::get('/carts', [CartController::class, 'index'])
+        ->name('carts.index');
+
+    Route::get('/carts/{id}', [CartController::class, 'show'])
+        ->name('carts.show');
+
+    Route::put('carts/{id}', [CartController::class, 'update'])
+        ->name('carts.update');
+
+    Route::delete('carts/{id}', [CartController::class, 'destroy'])
+        ->name('carts.destroy');
 });
 
