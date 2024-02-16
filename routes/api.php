@@ -6,6 +6,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\OrderController;
 
 /*
 |--------------------------------------------------------------------------
@@ -76,7 +77,7 @@ Route::middleware(['auth:api'])->group(function () {
 
     // Cart route
 
-    Route::post('carts', [CartController::class, 'store'])
+    Route::post('/carts', [CartController::class, 'store'])
         ->name('carts.store');
 
     Route::get('/carts', [CartController::class, 'index'])
@@ -85,10 +86,23 @@ Route::middleware(['auth:api'])->group(function () {
     Route::get('/carts/{id}', [CartController::class, 'show'])
         ->name('carts.show');
 
-    Route::put('carts/{id}', [CartController::class, 'update'])
+    Route::put('/carts/{id}', [CartController::class, 'update'])
         ->name('carts.update');
 
-    Route::delete('carts/{id}', [CartController::class, 'destroy'])
+    Route::delete('/carts/{id}', [CartController::class, 'destroy'])
         ->name('carts.destroy');
+
+
+    // Order route
+
+    Route::post('/orders', [OrderController::class, 'store'])
+        ->name('orders.store');
+
+    Route::get('/orders', [OrderController::class, 'index'])
+        ->name('orders.index');
+
+    Route::get('/orders/{id}', [OrderController::class, 'show'])
+        ->name('orders.show');
+
 });
 

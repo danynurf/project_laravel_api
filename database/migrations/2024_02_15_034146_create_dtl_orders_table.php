@@ -16,6 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('hdr_order_id');
             $table->unsignedBigInteger('product_id');
             $table->unsignedBigInteger('quantity');
+            $table->unsignedDouble('subtotal');
             $table->timestamps();
 
             $table->foreign('hdr_order_id')->references('id')->on('hdr_orders');

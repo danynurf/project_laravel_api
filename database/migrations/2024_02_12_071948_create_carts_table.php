@@ -11,14 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('dtl_carts', function (Blueprint $table) {
+        Schema::create('carts', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('hdr_cart_id');
             $table->unsignedBigInteger('product_id');
+            $table->unsignedBigInteger('buyer_user_id');
             $table->unsignedInteger('quantity');
             $table->timestamps();
 
-            $table->foreign('hdr_cart_id')->references('id')->on('hdr_carts');
+            $table->foreign('buyer_user_id')->references('id')->on('users');
             $table->foreign('product_id')->references('id')->on('products');
         });
     }

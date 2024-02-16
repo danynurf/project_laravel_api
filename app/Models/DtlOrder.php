@@ -9,7 +9,7 @@ class DtlOrder extends Model
 {
     use HasFactory;
 
-    protected $table = 'dtl_carts';
+    protected $table = 'dtl_orders';
 
     protected $guarded = [];
 }

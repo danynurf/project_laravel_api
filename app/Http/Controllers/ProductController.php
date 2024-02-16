@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Category;
 use App\Models\ProductCategory;
-use App\Models\DtlCart;
+use App\Models\Cart;
 use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
@@ -16,10 +16,21 @@ class ProductController extends Controller
      */
     public function index()
     {
+        $search = request()->query('search');
+        $category = request()->query('category');
         $products = Product::select('id', 'name', 'img', 'price', 'stock');
 
         if(auth()->user()->role == 'seller') {
             $products = $products->where('seller_user_id', auth()->id());
+        }
+
+        if($search != null) {
+            $products = $products->where('name', 'ILIKE', '%' . $search . '%');
+        }
+
+        if($category != null) {
+            $product_categories = ProductCategory::where('category_id', $category)->select('product_id')->get();
+            $products = $products->whereIn('id', $product_categories);
         }
 
         $products = $products->get();
@@ -241,7 +252,7 @@ class ProductController extends Controller
 
         $product = Product::find($id);
         $product_categories = ProductCategory::where('product_id', $id);
-        $carts = DtlCart::where('product_id', $id);
+        $carts = Cart::where('product_id', $id);
 
         if(!$product) {
             return response()->json([

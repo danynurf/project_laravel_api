@@ -13,7 +13,7 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        if(auth()->user()->role != 'admin') {
+        if(auth()->user()->role == 'buyer') {
             return response()->json([
                 'message' => 'You do not have a permission to access the content.'
             ], 403);
@@ -60,7 +60,7 @@ class CategoryController extends Controller
      */
     public function show(string $id)
     {
-        if(auth()->user()->role != 'admin') {
+        if(auth()->user()->role == 'buyer') {
             return response()->json([
                 'message' => 'You do not have a permission to access the content.'
             ], 403);

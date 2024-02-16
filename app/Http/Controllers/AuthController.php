@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
-use App\Models\HdrCart;
 
 class AuthController extends Controller
 {
@@ -25,7 +24,7 @@ class AuthController extends Controller
                 'message' => 'username or password wrong'
             ], 401);
         }
-        
+
         $role = auth()->user()->role;
 
         return response()->json([
@@ -65,12 +64,6 @@ class AuthController extends Controller
         ];
 
         $user = User::create($data);
-
-        if($role == 'buyer') {
-            HdrCart::create([
-                'buyer_user_id' => $user->id,
-            ]);
-        }
 
         return response()->json([
             'code' => 201,

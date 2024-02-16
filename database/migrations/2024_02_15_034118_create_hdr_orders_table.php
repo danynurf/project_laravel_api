@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('buyer_user_id');
             $table->unsignedDouble('total_price');
+            $table->unsignedDouble('payment');
             $table->timestamps();
 
             $table->foreign('buyer_user_id')->references('id')->on('users');

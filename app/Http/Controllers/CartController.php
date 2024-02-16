@@ -3,18 +3,12 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\DtlCart;
-use App\Models\HdrCart;
+use App\Models\Cart;
 use App\Models\Product;
 use Illuminate\Support\Facades\DB;
 
 class CartController extends Controller
 {
-    private $hdr_cart;
-
-    public function __construct() {
-        $this->hdr_cart =  HdrCart::where('buyer_user_id', auth()->id())->first();
-    }
     /**
      * Display a listing of the resource.
      */
@@ -26,10 +20,10 @@ class CartController extends Controller
             ], 403);
         }
 
-        $carts = DB::table('dtl_carts')
-                    ->join('products', 'products.id', '=', 'dtl_carts.product_id')
-                    ->select('products.id', 'products.name', 'products.img', 'products.description', 'products.price','dtl_carts.quantity')
-                    ->where('hdr_cart_id', $this->hdr_cart->id)
+        $carts = DB::table('carts')
+                    ->join('products', 'products.id', '=', 'carts.product_id')
+                    ->select('carts.id', 'products.name', 'products.img', 'products.description', 'products.price','carts.quantity')
+                    ->where('buyer_user_id', auth()->id())
                     ->get();
 
         return response()->json([
@@ -61,8 +55,7 @@ class CartController extends Controller
             ], 404);
         }
 
-        $hdr_cart = HdrCart::where('buyer_user_id', auth()->id())->first();
-        $cart = DtlCart::where('hdr_cart_id', $this->hdr_cart->id)->where('product_id', $validated['product_id'])->first();
+        $cart = Cart::where('buyer_user_id', auth()->id())->where('product_id', $validated['product_id'])->first();
 
         if($cart) {
             $quantity = $cart->quantity + $validated['quantity'];
@@ -84,8 +77,8 @@ class CartController extends Controller
             $validated['quantity'] = $product->stock;
         }
 
-        $validated['hdr_cart_id'] = $this->hdr_cart->id;
-        $result = DtlCart::create($validated);
+        $validated['buyer_user_id'] = auth()->id();
+        $result = Cart::create($validated);
 
         if(!$result) {
             return response()->json([
@@ -109,8 +102,7 @@ class CartController extends Controller
             ], 403);
         }
 
-        $hdr_cart = HdrCart::where('buyer_user_id', auth()->id());
-        $cart = DtlCart::where('hdr_cart_id', $this->hdr_cart->id)->find($id);
+        $cart = Cart::where('buyer_user_id', auth()->id())->find($id);
 
         if(!$cart) {
             return response()->json([
@@ -136,7 +128,7 @@ class CartController extends Controller
             ], 403);
         }
 
-        $cart = DtlCart::find($id);
+        $cart = Cart::find($id);
 
         if(!$cart) {
             return response()->json([
@@ -180,7 +172,7 @@ class CartController extends Controller
             ], 403);
         }
 
-        $cart = DtlCart::find($id);
+        $cart = Cart::find($id);
 
         if(!$cart) {
             return response()->json([
