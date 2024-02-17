@@ -18,6 +18,8 @@ class ProductController extends Controller
     {
         $search = request()->query('search');
         $category = request()->query('category');
+        $order = request()->query('order');
+        $order_dir = request()->query('order-dir');
         $products = Product::select('id', 'name', 'img', 'price', 'stock');
 
         if(auth()->user()->role == 'seller') {
@@ -31,6 +33,14 @@ class ProductController extends Controller
         if($category != null) {
             $product_categories = ProductCategory::where('category_id', $category)->select('product_id')->get();
             $products = $products->whereIn('id', $product_categories);
+        }
+
+        if($order != null) {
+            if($order_dir != null) {
+                $products = $products->orderBy($order, $order_dir);
+            } else {
+                $products = $products->orderBy($order, 'asc');
+            }
         }
 
         $products = $products->get();
