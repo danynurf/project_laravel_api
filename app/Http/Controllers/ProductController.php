@@ -276,12 +276,10 @@ class ProductController extends Controller
 
         if(!$product) {
             return response()->json([
-                'message'=> 'Failed to update product',
+                'message'=> 'Failed to delete product',
             ], 500);
         }
 
-        return response()->json([
-            'message' => 'Successfully to update product'
-        ], 200);
+        return response()->noContent();
     }
 }
